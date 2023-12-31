@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage"
+import axios from 'axios';
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
@@ -20,12 +21,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     navigate("/login", { replace: true });
   };
-
+  const axiosInstance = axios.create({
+    baseURL: 'http://localhost:6002', // Replace with your API's base URL
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': user?.authToken,
+    },
+  });
   const value = useMemo(
     () => ({
       user,
       login,
-      logout
+      logout,
+      axiosInstance
     }),
     [user]
   );

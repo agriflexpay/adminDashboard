@@ -27,7 +27,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   style={{
     color: colors.grey[100],
   }}
-  onClick={() =>{ setSelected(title);console.log(to)}}
+  onClick={() =>{ setSelected(title)}}
   icon={icon}
 >
   <Link to={to} style={{textDecoration:'none'}} >
@@ -90,7 +90,7 @@ const Side_Bar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  {`${user.user.fname} ${user.user.lname}`}
+                  Admins
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -117,10 +117,11 @@ const Side_Bar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
+                 {user.user.email}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  VP Fancy Admin
+                {`${user.user.fname} ${user.user.lname}`}
+
            
                 </Typography>
               </Box>

@@ -16,21 +16,24 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import Login from "./scenes/login/Login";
-import { AuthProvider, useAuth } from "./AUTH/AuthContext";
-import {useLocalStorage} from "./AUTH/useLocalStorage"
+import { useAuth } from "./AUTH/AuthContext";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(false);
   const {user} = useAuth()
+  const queryClient = new QueryClient()
+
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
+      <QueryClientProvider client={queryClient}>
       <CssBaseline />
 
  
           {
-            user!==null?? user.user?(
+            user!==null && user.user?(
                 <div className="app">
             
                 {/**handle authentication and routes protections */}
@@ -61,7 +64,7 @@ function App() {
               ):<Login></Login>
             }
           
-    
+          </QueryClientProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );
