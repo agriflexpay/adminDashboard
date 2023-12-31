@@ -11,6 +11,7 @@ import Form from "./scenes/form";
 import Line from "./scenes/line";
 import Pie from "./scenes/pie";
 import FAQ from "./scenes/faq";
+import FullFeaturedCrudGrid from "./scenes/test"
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
@@ -56,6 +57,7 @@ function App() {
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/calendar" element={<Calendar />} />
                     <Route path="/geography" element={<Geography />} />
+                    <Route path="/test" element={<FullFeaturedCrudGrid />} />
                   </Routes>
                 </main>
             

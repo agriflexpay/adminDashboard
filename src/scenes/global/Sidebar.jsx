@@ -166,7 +166,13 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
+            <Item
+              title="test"
+              to="/test"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}

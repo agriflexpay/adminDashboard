@@ -13,4 +13,39 @@ export const axiosInstance = axios.create({
   },
 });
 
+axiosInstance.interceptors.response.use(
+  (response) => {
+    if(response.status==403){
+      console.log(response)
+      window.location.reload()
+      return Promise.reject(error);
+    }
+    return response
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response.status === 403 &&
+      originalRequest.url === 'http://localhost:6002/api/auth/refreshToken'
+    ) {
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
 
+    if (error.response.status === 403 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = user.refreshToken;
+      try {
+        const { data } = await axiosInstance.post('/api/auth/refreshToken', {
+          refreshToken,
+        });
+        setUser(data);
+        axiosInstance.defaults.headers['x-access-token'] = data.authToken;
+        return axiosInstance(originalRequest);
+      } catch (_error) {
+        return Promise.reject(_error);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
