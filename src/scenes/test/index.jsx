@@ -6,12 +6,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import { useTheme } from "@mui/material";
+import BasicModal from "./EditorModal"
 import { tokens } from "../../theme";
 import {
   GridRowModes,
@@ -58,7 +57,11 @@ function EditToolbar(props) {
 
 export default function FullFeaturedCrudGrid() {
   const { axiosInstance } = useAuth();
-
+  const [open, setOpen] = React.useState(false);
+  const [userdata, setUserdata]= React.useState({})
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleSaveData=(data)=>setUserdata(data)
     const fetchUsers = async () => {
         try {
             const response = await axiosInstance.get("/api/user/fetchAll")
@@ -82,8 +85,10 @@ export default function FullFeaturedCrudGrid() {
     }
   };
 
-  const handleEditClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  const handleEditClick = ({id,data}) => () => {
+    setUserdata({data,id})
+    handleOpen(); // Open the modal
+    
   };
 
   const handleSaveClick = (id) => () => {
@@ -117,14 +122,14 @@ export default function FullFeaturedCrudGrid() {
   };
 
   const columns = [
-    // { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "id", headerName: "ID", flex: 1 },
   {field:"fname",headerName:"First Name",flex:1},
   {field:"lname",headerName:"Last Name",flex:1},
   {field:"email",headerName:"Email",flex:1},
   {field:"national_id",headerName:"National ID",flex:1},
   {field:"krapin",headerName:"KRA PIN",flex:1},
   {field:"phone",headerName:"Phone",flex:1},
-  {field:"is_active",headerName:"Status",flex:1},
+  //{field:"is_active",headerName:"Status",flex:1},
   {field:"role",headerName:"Access Level",flex:1,
       renderCell: ({ row: { role } }) => {
         return (
@@ -192,7 +197,12 @@ export default function FullFeaturedCrudGrid() {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            //map through the data and return the id of the selected row
+            onClick={handleEditClick({
+              id,
+              data: rows.find((row) => row.id === id),
+            
+            })}
             color="inherit"
           />,
           <GridActionsCellItem
@@ -252,6 +262,17 @@ export default function FullFeaturedCrudGrid() {
           toolbar: { setRows, setRowModesModel },
         }}
       />
+       {/* Render the BasicModal component when open state is true */}
+       {open && (
+        <BasicModal
+          open={open}
+          handleOpen={handleOpen}
+          handleClose={handleClose}
+          userdata={userdata}
+          handleSaveData={handleSaveData}
+          // Pass any additional props needed by BasicModal
+        />
+      )}
     </Box>
   );
 }

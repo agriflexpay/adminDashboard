@@ -3,9 +3,8 @@ import { Box, TextField, Button } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
-import { useNavigate } from "react-router-dom";
 import {useAuth} from "../../AUTH/AuthContext"
-import { useLocalStorage } from "../../AUTH/useLocalStorage";
+
 const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
@@ -19,7 +18,9 @@ const initialValues = {
 
 
 function Login() {
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = () => setShowPassword(false);
   const {login}= useAuth()
   const handleFormSubmit = async (values, { setSubmitting })  => {
     const data = {
