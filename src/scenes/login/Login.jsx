@@ -4,7 +4,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import {useAuth} from "../../AUTH/AuthContext"
-
+import React from "react";  
 const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
