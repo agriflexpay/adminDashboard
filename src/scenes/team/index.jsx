@@ -30,13 +30,14 @@ const Team = () => {
         const response = await axiosInstance.get("/api/user/fetchAll")
         return response
     } catch (error) {
-        console.log(error);
+        //console.log(error.confiq);
     }
   }
 
   const { data,error } = useQuery("users", fetchUsers);
 
  const rows = data?.data?.data||[]
+ console.log(rows)
   const columns= [
   //{ field: "id", headerName: "ID", flex: 0.5 },
   {field:"fname",headerName:"First Name",flex:1},

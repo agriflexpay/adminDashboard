@@ -29,11 +29,30 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [role, setRole] = React.useState('');
+    const [location, setLocation] = React.useState(null);
+    React.useEffect(() => {
+        const getLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        setLocation({ latitude, longitude });
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error.message);
+                    }
+                );
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        };
 
+        getLocation();
+    }, [])
     const handleChange = (event) => {
-      setRole(event.target.value);
+        setRole(event.target.value);
     };
-  
+
     const initialValues = {
         email: userdata?.data?.email || '',
         firstname: userdata?.data?.fname || '',
@@ -41,16 +60,17 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
         phone: userdata?.data?.phone || '',
         national_id: userdata?.data?.national_id || '',
         krapin: userdata?.data?.krapin || '',
-        is_active: userdata?.data?.is_active || '',
+        is_active: userdata?.data?.is_active || false,
         role: userdata?.data?.role || '',
-        address_id: userdata?.data?.address_id || '',
+        address_id: userdata?.data?.Address?.county || '',
         is_account_verified: userdata?.data?.is_account_verified || false,
-        latitude: userdata?.data?.latitude || '',
-        longitude: userdata?.data?.longitude || '',
-    };
+        latitude:  location?.latitude || 0o0,
+        longitude: location?.longitude || 0o0,
 
+    };
     const handleFormSubmit = async (values, { setSubmitting }) => {
-        handleClose();
+        console.log(`values`, values)
+        console.log(values.role)
         // Add logic for form submission or data saving
     };
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -119,11 +139,11 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                 >
                                     {/**grid to fill a row */}
                                     <Grid
-                                    display="flex"
-                                    justifyContent="center" 
-                                    item 
-                                    sx={{width:'100%'}}
-                                    
+                                        display="flex"
+                                        justifyContent="center"
+                                        item
+                                        sx={{ width: '100%' }}
+
                                     >
                                         <Header title="UPDATE USER" subtitle="Update user  Profile,change roles and addresses" />
                                     </Grid>
@@ -217,21 +237,21 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                             helperText={touched.krapin && errors.krapin}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    {/* <Grid item xs={12} sm={4}>
                                         <TextField
                                             id="is_active"
                                             name="is_active"
                                             label="Status"
                                             type="text"
                                             variant="filled"
-                                            value={values.is_active}
+                                            value={`${values.is_active == false ? "InActive" : "Active"}`}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             sx={{ mb: 2, width: '100%', padding: '5px' }}
                                             error={touched.is_active && Boolean(errors.is_active)}
                                             helperText={touched.is_active && errors.is_active}
                                         />
-                                    </Grid>
+                                    </Grid> */}
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             id="role"
@@ -251,7 +271,7 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                         <TextField
                                             id="address_id"
                                             name="address_id"
-                                            label="Address ID"
+                                            label="Home County"
                                             type="text"
                                             variant="filled"
                                             value={values.address_id}
@@ -265,31 +285,67 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
 
                                     <Grid item xs={12} sm={4}>
                                         <FormControl fullWidth>
-                                            <InputLabel id="Role">Role</InputLabel>
+                                            <InputLabel id="role">Role</InputLabel>
                                             <Select
-                                                labelId="Role"
+                                                labelId="role"
                                                 id="role"
-                                                value={role}
+                                                name='role'  // Make sure this matches the name you want to update in your state
+                                                value={values.role}
                                                 label="Role"
                                                 onChange={handleChange}
-                                                defaultValue='Farmer'
-                                                backgroundColor={colors.primary[400]}
+                                                error={touched.role && Boolean(errors.role)}
                                             >
                                                 <MenuItem value={1}>Admin</MenuItem>
                                                 <MenuItem value={2}>Agent</MenuItem>
                                                 <MenuItem value={3}>Vet Doctor</MenuItem>
                                                 <MenuItem value={4}>Farmer</MenuItem>
                                             </Select>
+                                            {touched.role && errors.role && (
+                                                <p style={{ color: 'red' }}>{errors.role}</p>
+                                            )}
                                         </FormControl>
                                     </Grid>
-
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            id="longitude"
+                                            name="longitude"
+                                            label="Longitude"
+                                            type="number"
+                                            variant="filled"
+                                            value={values.longitude}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
+                                            error={touched.longitude && Boolean(errors.longitude)}
+                                            helperText={touched.longitude && errors.longitude}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            id="latitude"
+                                            name="latitude"
+                                            label="Latitude"
+                                            type="number"
+                                            variant="filled"
+                                            value={values.latitude}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
+                                            error={touched.latitude && Boolean(errors.latitude)}
+                                            helperText={touched.latitude && errors.latitude}
+                                        />
+                                    </Grid>
 
                                     <Grid item lg={6} md={6} xs={12} sm={4}>
                                         <Button
                                             type="submit"
                                             variant="contained"
-                                            sx={{ width: "20rem" }}
-                                            color="secondary">
+                                            sx={{ width: "20rem", margin: "10px"}}
+                                            color="secondary"
+                                            onClick={console.log(`values`, values)}
+
+                                        >
+
                                             Submit
                                         </Button>
                                     </Grid>

@@ -37,8 +37,7 @@ function Login() {
       .then((res) => {
      
           if (res.status === 200) {
-            login(res.data.data)
-            
+            login(res.data.data)  
           }
       })
       .catch((err) => {

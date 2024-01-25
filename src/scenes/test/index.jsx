@@ -29,6 +29,7 @@ import {
 import {useQuery} from "react-query";
 import { useAuth } from "../../AUTH/AuthContext";
 const roles = ['Admin', 'Agent', 'Farmer','Vet Doctor'];
+import {useLocalStorage} from "../../AUTH/useLocalStorage"
 const randomRole = () => {
   return randomArrayItem(roles);
 };
@@ -67,13 +68,22 @@ export default function FullFeaturedCrudGrid() {
             const response = await axiosInstance.get("/api/user/fetchAll")
             return response
         } catch (error) {
-            console.log(error);
+            console.log(error?.response?.status);
+            useLocalStorage("user", null);
+            window.location.reload();
         }
       }
     
       const { data,error } = useQuery("users", fetchUsers);
+
     
     const   initialRows = data?.data?.data||[]
+
+    React.useEffect(() => {
+      setRows(data?.data?.data||[])
+    }, [data])
+  
+    console.log(initialRows)
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState(initialRows);
@@ -122,14 +132,14 @@ export default function FullFeaturedCrudGrid() {
   };
 
   const columns = [
-  { field: "id", headerName: "ID", flex: 1 },
+  // { field: "id", headerName: "ID", flex: 1 },
   {field:"fname",headerName:"First Name",flex:1},
   {field:"lname",headerName:"Last Name",flex:1},
   {field:"email",headerName:"Email",flex:1},
   {field:"national_id",headerName:"National ID",flex:1},
   {field:"krapin",headerName:"KRA PIN",flex:1},
   {field:"phone",headerName:"Phone",flex:1},
-  //{field:"is_active",headerName:"Status",flex:1},
+  {field:"is_active",headerName:"Status",flex:1},
   {field:"role",headerName:"Access Level",flex:1,
       renderCell: ({ row: { role } }) => {
         return (
