@@ -24,13 +24,13 @@ import { useAuth } from "../../AUTH/AuthContext";
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { axiosInstance } = useAuth();
+  const { axiosInstance,logout } = useAuth();
   const fetchUsers = async () => {
     try {
         const response = await axiosInstance.get("/api/user/fetchAll")
         return response
     } catch (error) {
-        //console.log(error.confiq);
+        logout()
     }
   }
 
@@ -39,12 +39,12 @@ const Team = () => {
  const rows = data?.data?.data||[]
  console.log(rows)
   const columns= [
-  //{ field: "id", headerName: "ID", flex: 0.5 },
+  { field: "id", headerName: "ID", flex: 0.5 },
   {field:"fname",headerName:"First Name",flex:1},
   {field:"lname",headerName:"Last Name",flex:1},
   {field:"email",headerName:"Email",flex:1},
   {field:"national_id",headerName:"National ID",flex:1},
- // {field:"krapin",headerName:"KRA PIN",flex:1},
+  {field:"krapin",headerName:"KRA PIN",flex:1},
   {field:"phone",headerName:"Phone",flex:1},
   {field:"is_active",headerName:"Status",flex:1,
       renderCell: ({ row: { is_active } }) => {
@@ -100,12 +100,12 @@ const Team = () => {
           </Box>
         );
       }},
-  //{field:"createdAt",headerName:"Created At",flex:1},
- // {field:"updatedAt",headerName:"Updated At",flex:1},
- // {field:"address_id",headerName:"Address ID",flex:1},
- // {field:"is_account_verified",headerName:"Account Verified",flex:1},
- // {field:"latitude",headerName:"Latitude",flex:1},
-//  {field:"longitude",headerName:"Longitude",flex:1},
+  {field:"createdAt",headerName:"Created At",flex:1},
+ {field:"updatedAt",headerName:"Updated At",flex:1},
+ {field:"address_id",headerName:"Address ID",flex:1},
+ {field:"is_account_verified",headerName:"Account Verified",flex:1},
+ {field:"latitude",headerName:"Latitude",flex:1},
+ {field:"longitude",headerName:"Longitude",flex:1},
   ]
  
 

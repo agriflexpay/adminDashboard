@@ -129,14 +129,14 @@ const Side_Bar = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-{/*             
+            
             <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
 
             <Typography
               variant="h6"
@@ -152,7 +152,7 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            {/* <Item
+            <Item
               title="Contacts Information"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
@@ -165,7 +165,7 @@ const Side_Bar = () => {
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
             <Item
               title="test"
               to="/test"
@@ -173,7 +173,7 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            {/* <Typography
+            <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -236,7 +236,7 @@ const Side_Bar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
           </Box>
         </Menu>
       </Sidebar>

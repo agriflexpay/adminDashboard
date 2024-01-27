@@ -10,6 +10,10 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from '../../components/Header';
+import {useQuery} from "react-query";
+import { useAuth } from "../../AUTH/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const checkoutSchema = yup.object().shape({
     email: yup.string().email("invalid email").required("required"),
     firstname: yup.string().required("required"),
@@ -25,10 +29,11 @@ const checkoutSchema = yup.object().shape({
     longitude: yup.string().required("required"),
 });
 
-export default function BasicModal({ open, handleOpen, handleClose, userdata, handleSaveData }) {
+export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
     const theme = useTheme();
+  
+    const { axiosInstance,showToastMessage } = useAuth();
     const colors = tokens(theme.palette.mode);
-    const [role, setRole] = React.useState('');
     const [location, setLocation] = React.useState(null);
     React.useEffect(() => {
         const getLocation = () => {
@@ -49,9 +54,25 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
 
         getLocation();
     }, [])
-    const handleChange = (event) => {
-        setRole(event.target.value);
-    };
+
+    const fetchlocations = async () => {
+        try{
+            const response = await axiosInstance.get("/api/address")
+            return response
+        }
+        catch(error){
+            console.log(error?.response?.status);
+        }
+
+    }
+    const { data } = useQuery("locations", fetchlocations);
+    //map through the data and return the object with the id=userdata?.data?.Address
+    const Address_data= data?.data?.data?.map((item) => {
+        if (item.id == userdata?.data?.Address?.id) {
+            return item
+        }
+    })
+    //console.log(Address_data)
 
     const initialValues = {
         email: userdata?.data?.email || '',
@@ -62,19 +83,49 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
         krapin: userdata?.data?.krapin || '',
         is_active: userdata?.data?.is_active || false,
         role: userdata?.data?.role || '',
-        address_id: userdata?.data?.Address?.county || '',
+        address_id: userdata?.data?.Address?.id|| '',
         is_account_verified: userdata?.data?.is_account_verified || false,
         latitude:  location?.latitude || 0o0,
         longitude: location?.longitude || 0o0,
 
     };
     const handleFormSubmit = async (values, { setSubmitting }) => {
-        console.log(`values`, values)
-        console.log(values.role)
-        // Add logic for form submission or data saving
+        const data = {
+            email: values.email,
+            fname: values.firstname,
+            lname: values.lastname,
+            phone: values.phone,
+            national_id: values.national_id,
+            krapin: values.krapin,
+            role: values.role,
+            address_id: values.address_id,
+            is_account_verified: values.is_account_verified,
+            latitude: location?.latitude || 0o0,
+            longitude: location?.longitude || 0o0,
+        };
+        //send the data to the backend
+        await axiosInstance.put(`/api/user/update/${userdata.id}`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            withCredentials: true,
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    handleClose()
+                    setSuccess(true)
+                    showToastMessage("User Updated Successfully","success")
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+       
     };
     const isNonMobile = useMediaQuery("(min-width:600px)");
     return (
+      
+
         <Box m={"20px"}
             sx={{
                 "& > div": { gridColumn: isNonMobile ? "span 3" : "span 4" },
@@ -82,6 +133,7 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
             }}
             color={colors.greenAccent[900]}
         >
+              
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -145,8 +197,11 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                         sx={{ width: '100%' }}
 
                                     >
-                                        <Header title="UPDATE USER" subtitle="Update user  Profile,change roles and addresses" />
+                                        <Header title="UPDATE USER" subtitle="Update user  Profile,change roles and addresses" /><br />
+                                   
+                                       
                                     </Grid>
+                                   
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             id="email"
@@ -237,74 +292,59 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                             helperText={touched.krapin && errors.krapin}
                                         />
                                     </Grid>
-                                    {/* <Grid item xs={12} sm={4}>
-                                        <TextField
-                                            id="is_active"
-                                            name="is_active"
-                                            label="Status"
-                                            type="text"
-                                            variant="filled"
-                                            value={`${values.is_active == false ? "InActive" : "Active"}`}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
-                                            error={touched.is_active && Boolean(errors.is_active)}
-                                            helperText={touched.is_active && errors.is_active}
-                                        />
-                                    </Grid> */}
+                        
                                     <Grid item xs={12} sm={4}>
-                                        <TextField
-                                            id="role"
-                                            name="role"
-                                            label="Access Level"
-                                            type="text"
-                                            variant="filled"
-                                            value={values.role}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
-                                            error={touched.role && Boolean(errors.role)}
-                                            helperText={touched.role && errors.role}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <TextField
-                                            id="address_id"
-                                            name="address_id"
-                                            label="Home County"
-                                            type="text"
-                                            variant="filled"
-                                            value={values.address_id}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
-                                            error={touched.address_id && Boolean(errors.address_id)}
-                                            helperText={touched.address_id && errors.address_id}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={12} sm={4}>
-                                        <FormControl fullWidth>
+                                        <FormControl fullWidth >
                                             <InputLabel id="role">Role</InputLabel>
                                             <Select
                                                 labelId="role"
                                                 id="role"
-                                                name='role'  // Make sure this matches the name you want to update in your state
+                                                name='role'
                                                 value={values.role}
                                                 label="Role"
                                                 onChange={handleChange}
+                                                sx={{ mb: 2, width: '100%', paddingRight: '10px'}}
                                                 error={touched.role && Boolean(errors.role)}
                                             >
-                                                <MenuItem value={1}>Admin</MenuItem>
-                                                <MenuItem value={2}>Agent</MenuItem>
-                                                <MenuItem value={3}>Vet Doctor</MenuItem>
-                                                <MenuItem value={4}>Farmer</MenuItem>
+                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={1}>Admin</MenuItem>
+                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={2}>Agent</MenuItem>
+                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={3}>Vet Doctor</MenuItem>
+                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={4}>Farmer</MenuItem>
                                             </Select>
                                             {touched.role && errors.role && (
                                                 <p style={{ color: 'red' }}>{errors.role}</p>
                                             )}
                                         </FormControl>
                                     </Grid>
+
+                                    <Grid item xs={12} sm={4}>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="address_id">Home County</InputLabel>
+                                            <Select
+                                                   id="address_id"
+                                                   name="address_id"
+                                                   label="Home County"
+                                                   type="text"
+                                                   variant="filled"
+                                                   value={values.address_id}
+                                                   onChange={handleChange}
+                                                   onBlur={handleBlur}
+                                                   sx={{ mb: 2, width: '100%', padding: '5px' }}
+                                                   error={touched.address_id && Boolean(errors.address_id)}
+                                                   helperText={touched.address_id && errors.address_id}
+                                            >
+                                                {
+                                                    data?.data?.data?.map((item) => (
+                                                        <MenuItem sx={{backgroundColor:'Highlight'}} value={item.id} key={item.id}>{item.county}</MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                            {touched.role && errors.role && (
+                                                <p style={{ color: 'red' }}>{errors.role}</p>
+                                            )}
+                                        </FormControl>
+                                    </Grid>
+
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             id="longitude"
@@ -342,13 +382,27 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
                                             variant="contained"
                                             sx={{ width: "20rem", margin: "10px"}}
                                             color="secondary"
-                                            onClick={console.log(`values`, values)}
-
                                         >
 
                                             Submit
                                         </Button>
+                                        
+
+                                        <Button
+                                            type="button"
+                                            variant="contained"
+                                            sx={{ width: "20rem", margin: "10px"}}
+                                            color="secondary"
+                                            onClick={handleClose}
+                                        >
+
+                                            Cancel
+                                        </Button>
                                     </Grid>
+                                    <Grid item lg={6} md={6} xs={12} sm={4}>
+
+                                    </Grid>
+
 
                                 </Grid>
 
@@ -361,5 +415,6 @@ export default function BasicModal({ open, handleOpen, handleClose, userdata, ha
 
             </Modal>
         </Box>
+       
     );
 }

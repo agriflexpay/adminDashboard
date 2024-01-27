@@ -29,7 +29,8 @@ import {
 import {useQuery} from "react-query";
 import { useAuth } from "../../AUTH/AuthContext";
 const roles = ['Admin', 'Agent', 'Farmer','Vet Doctor'];
-import {useLocalStorage} from "../../AUTH/useLocalStorage"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const randomRole = () => {
   return randomArrayItem(roles);
 };
@@ -57,25 +58,31 @@ function EditToolbar(props) {
 }
 
 export default function FullFeaturedCrudGrid() {
-  const { axiosInstance } = useAuth();
+  const { axiosInstance,logout,showToastMessage } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [userdata, setUserdata]= React.useState({})
+  const [success, setSuccess] = React.useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSaveData=(data)=>setUserdata(data)
-    const fetchUsers = async () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+ if(success ){
+  setSuccess(false)
+  }
+
+  const fetchUsers = async () => {
         try {
             const response = await axiosInstance.get("/api/user/fetchAll")
             return response
         } catch (error) {
-            console.log(error?.response?.status);
-            useLocalStorage("user", null);
-            window.location.reload();
+            if(error?.response?.status===403){
+             logout()
+            }
         }
       }
     
       const { data,error } = useQuery("users", fetchUsers);
-
     
     const   initialRows = data?.data?.data||[]
 
@@ -83,9 +90,8 @@ export default function FullFeaturedCrudGrid() {
       setRows(data?.data?.data||[])
     }, [data])
   
-    console.log(initialRows)
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+  
+
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState({});
 
@@ -167,12 +173,12 @@ export default function FullFeaturedCrudGrid() {
           </Box>
         );
       }},
-//   {field:"createdAt",headerName:"Created At",flex:1},
-//  {field:"updatedAt",headerName:"Updated At",flex:1},
- // {field:"address_id",headerName:"Address ID",flex:1},
-// {field:"is_account_verified",headerName:"Account Verified",flex:1},
- //{field:"latitude",headerName:"Latitude",flex:1},
- //{field:"longitude",headerName:"Longitude",flex:1},
+//    {field:"createdAt",headerName:"Created At",flex:1},
+//   {field:"updatedAt",headerName:"Updated At",flex:1},
+//   {field:"address_id",headerName:"Address ID",flex:1},
+//  {field:"is_account_verified",headerName:"Account Verified",flex:1},
+//  {field:"latitude",headerName:"Latitude",flex:1},
+//  {field:"longitude",headerName:"Longitude",flex:1},
     {
       field: 'actions',
       type: 'actions',
@@ -227,6 +233,19 @@ export default function FullFeaturedCrudGrid() {
   ];
 
   return (
+    <>
+   <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme.palette.mode === "dark" ? "dark" : "light"}
+      />
     <Box
     sx={{
         "& .MuiDataGrid-root": {
@@ -276,6 +295,7 @@ export default function FullFeaturedCrudGrid() {
        {open && (
         <BasicModal
           open={open}
+          setSuccess={setSuccess}
           handleOpen={handleOpen}
           handleClose={handleClose}
           userdata={userdata}
@@ -284,5 +304,6 @@ export default function FullFeaturedCrudGrid() {
         />
       )}
     </Box>
+    </>
   );
 }
