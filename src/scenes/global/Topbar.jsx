@@ -1,5 +1,6 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, Button, IconButton, useTheme } from "@mui/material";
 import { useContext } from "react";
+import * as React from 'react';
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -9,12 +10,22 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { ToastContainer, toast } from "react-toastify";
+import { useAuth } from "../../AUTH/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
-
+import BasicModal from "../../components/Userprofile";
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false)
+  const { user, logout } = useAuth();
+
+const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+  }
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -44,9 +55,24 @@ const Topbar = () => {
         <IconButton>
           <SettingsOutlinedIcon />
         </IconButton>
+        <Button  onClick={handleOpen}>
         <IconButton>
           <PersonOutlinedIcon />
         </IconButton>
+        </Button>
+      </Box>
+      <Box
+        display="none"
+      >
+        {
+          open && <BasicModal
+            open={open}
+            handleOpen={handleOpen}
+            handleClose={handleClose}
+            user={user}
+            logout={handleLogout}
+          />
+        }
       </Box>
     </Box>
   );
