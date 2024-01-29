@@ -32,7 +32,7 @@ const checkoutSchema = yup.object().shape({
 export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
     const theme = useTheme();
   
-    const { axiosInstance,showToastMessage } = useAuth();
+    const { axiosInstance,showToastMessage,logout  } = useAuth();
     const colors = tokens(theme.palette.mode);
     const [location, setLocation] = React.useState(null);
     React.useEffect(() => {
@@ -119,6 +119,7 @@ export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
             })
             .catch((err) => {
                 console.log(err);
+                logout()
             });
        
     };
