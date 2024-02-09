@@ -21,13 +21,13 @@ import CancelIcon from '@mui/icons-material/Close';
 import Header from "../../components/Header";
 import {useQuery} from "react-query";
 import { useAuth } from "../../AUTH/AuthContext";
-const Team = () => {
+const Agents = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { axiosInstance,logout } = useAuth();
   const fetchUsers = async () => {
     try {
-        const response = await axiosInstance.get("/api/user/fetchAll")
+        const response = await axiosInstance.get("/api/agent/get-all")
         return response
     } catch (error) {
         logout()
@@ -36,15 +36,32 @@ const Team = () => {
 
   const { data,error } = useQuery("users", fetchUsers);
 
- const rows = data?.data?.data||[]
- console.log(rows)
+ const rows = data?.data?.data.map((agent)=>{
+  return{
+    id:agent?.id,
+    user_uuid:agent?.user_uuid,
+    agency_uuid:agent?.agency_uuid,
+    email:agent?.User?.email,
+    phone:agent?.User?.phone,
+    fname:agent?.User?.fname,
+    lname:agent?.User?.lname,
+    is_active:agent?.User?.is_active,
+    address_id:agent?.User?.address_id,
+    is_account_verified:agent?.User?.is_account_verified,
+    latitude:agent?.User?.latitude,
+    longitude:agent?.User?.longitude
+  
+  }
+}
+)||[]
+
   const columns= [
-  { field: "id", headerName: "ID", flex: 0.5 },
+  //{ field: "id", headerName: "ID", flex: 0.5 },
   {field:"fname",headerName:"First Name",flex:1},
   {field:"lname",headerName:"Last Name",flex:1},
   {field:"email",headerName:"Email",flex:1},
-  {field:"national_id",headerName:"National ID",flex:1},
-  {field:"krapin",headerName:"KRA PIN",flex:1},
+  // {field:"national_id",headerName:"National ID",flex:1},
+  // {field:"krapin",headerName:"KRA PIN",flex:1},
   {field:"phone",headerName:"Phone",flex:1},
   {field:"is_active",headerName:"Status",flex:1,
       renderCell: ({ row: { is_active } }) => {
@@ -55,7 +72,7 @@ const Team = () => {
             p="5px"
             display="flex"
             justifyContent="center"
-            backgroundColor={
+           color={
               is_active ===true
                 ? colors.greenAccent[600]
                 : is_active ===false
@@ -73,39 +90,7 @@ const Team = () => {
         );
       }
 },
- {field:"role",headerName:"Access Level",flex:1,
-      renderCell: ({ row: { role } }) => {
-        return (
-          <Box
-            width="60%"
-            m="0 auto"
-            p="5px"
-            display="flex"
-            justifyContent="center"
-            backgroundColor={
-              role === "1"
-                ? colors.greenAccent[600]
-                : role === "2"
-                ? colors.greenAccent[700]
-                : colors.grey[700]
-            }
-            borderRadius="4px"
-          >
-            {role === "1" && <AdminPanelSettingsOutlinedIcon />}
-            {role === "2" && <SecurityOutlinedIcon />}
-            {role === "3" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: "2px" }}>
-              {role==1?"Admin":role==2?"Manager":"User"}
-            </Typography>
-          </Box>
-        );
-      }},
-  {field:"createdAt",headerName:"Created At",flex:1},
- {field:"updatedAt",headerName:"Updated At",flex:1},
- {field:"address_id",headerName:"Address ID",flex:1},
- {field:"is_account_verified",headerName:"Account Verified",flex:1},
- {field:"latitude",headerName:"Latitude",flex:1},
- {field:"longitude",headerName:"Longitude",flex:1},
+
   ]
  
 
@@ -113,7 +98,7 @@ const Team = () => {
     <Box m="20px">
       <Header
        title="TEAM" 
-       subtitle="Managing the Team Members
+       subtitle="Managing the Agents Members
        " />
       <Box
         m="40px 0 0 0"
@@ -158,4 +143,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default Agents;

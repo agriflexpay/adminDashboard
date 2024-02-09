@@ -117,7 +117,7 @@ const Side_Bar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                 {user.user.email}
+                 {user?.user?.Agency?.name}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                 {`${user.user.fname} ${user.user.lname}`}
@@ -130,13 +130,13 @@ const Side_Bar = () => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             
-            <Item
+            {/* <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
             <Typography
               variant="h6"
@@ -145,14 +145,21 @@ const Side_Bar = () => {
             >
               Data
             </Typography>
-            {/* <Item
-              title="Manage Team"
+            <Item
+              title="Manage Users"
               to="/team"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Manage Agents"
+              to="/agents"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
-            <Item
+            />
+            {/* <Item
               title="Contacts Information"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
@@ -165,14 +172,8 @@ const Side_Bar = () => {
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
-            <Item
-              title="Manage Users"
-              to="/team"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            /> */}
+       
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -180,7 +181,7 @@ const Side_Bar = () => {
             >
               Pages
             </Typography>
-            <Item
+            {/* <Item
               title="Profile Form"
               to="/form"
               icon={<PersonOutlinedIcon />}
@@ -236,7 +237,7 @@ const Side_Bar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
         </Menu>
       </Sidebar>
@@ -245,3 +246,4 @@ const Side_Bar = () => {
 };
 
 export default Side_Bar;
+

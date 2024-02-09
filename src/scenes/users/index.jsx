@@ -194,17 +194,17 @@ export default function ManageTeam() {
             p="5px"
             display="flex"
             justifyContent="center"
-            backgroundColor={
+            color={
               is_active === true
                 ? colors.greenAccent[600]
                 : is_active === false
-                ? colors.grey[700]
+                ? colors.redAccent[400]
                 : null
             }
             borderRadius="4px"
           >
-            {is_active === true && <ToggleOffOutlinedIcon />}
-            {is_active === false && <ToggleOnOutlinedIcon />}
+            {is_active === true &&<ToggleOnOutlinedIcon />}
+            {is_active === false &&  <ToggleOffOutlinedIcon />}
             <Typography color={colors.grey[100]} sx={{ ml: "2px" }}>
               {is_active == true
                 ? "Active"
@@ -380,9 +380,9 @@ export default function ManageTeam() {
           onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
-          slots={{
-            toolbar: EditToolbar,
-          }}
+          // slots={{
+          //   toolbar: EditToolbar,
+          // }}
           slotProps={{
             toolbar: { setRows, setRowModesModel },
           }}

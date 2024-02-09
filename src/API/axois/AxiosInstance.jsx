@@ -12,7 +12,7 @@ export const axiosInstance = axios.create({
     'x-access-token': apiKey,
   },
 });
-axios.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => {
     console.log('interceptor', response);
     if (response.status === 403) {

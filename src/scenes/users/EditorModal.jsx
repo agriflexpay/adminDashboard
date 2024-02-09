@@ -31,7 +31,7 @@ const checkoutSchema = yup.object().shape({
 
 export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
     const theme = useTheme();
-  
+    const {user} = useAuth()
     const { axiosInstance,showToastMessage,logout  } = useAuth();
     const colors = tokens(theme.palette.mode);
     const [location, setLocation] = React.useState(null);
@@ -104,6 +104,52 @@ export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
             longitude: location?.longitude || 0o0,
         };
         //send the data to the backend
+        if(data.role==2){
+            const agent={
+                agency_uuid: userdata?.data?.agency_uuid,
+                user_uuid: userdata?.data?.id
+            }
+            await axiosInstance.post('/api/agent/create',agent, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true,
+            }).then((res) => {
+                if (res.status === 200) {
+                    //handle success
+                }
+            }
+            ).catch((err) => {
+                handleClose()
+                setSuccess(true)
+                showToastMessage(err,"error")
+               
+            }
+            )
+        }
+        if(data.role==3){
+            const doctor={
+                user_uuid: userdata?.data?.id,
+                agency_uuid: userdata?.data?.agency_uuid
+            }
+            await axiosInstance.post('/api/vet_doctor',doctor, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true,
+            }).then((res) => {
+                if (res.status === 200) {
+                    //handle success
+                }
+            }
+            ).catch((err) => {
+                handleClose()
+                setSuccess(true)
+                showToastMessage(err,"error")
+              
+            }
+            )
+        }
         await axiosInstance.put(`/api/user/update/${userdata.id}`, data, {
             headers: {
                 'Content-Type': 'application/json',
@@ -140,6 +186,14 @@ export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
+                sx={
+                    {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb:"2rem"
+                    }
+                }
             >
 
                 <Formik
@@ -307,10 +361,12 @@ export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
                                                 sx={{ mb: 2, width: '100%', paddingRight: '10px'}}
                                                 error={touched.role && Boolean(errors.role)}
                                             >
-                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={1}>Admin</MenuItem>
-                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={2}>Agent</MenuItem>
-                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={3}>Vet Doctor</MenuItem>
-                                                <MenuItem sx={{backgroundColor:'Highlight'}} value={4}>Farmer</MenuItem>
+                                                
+                                                <MenuItem sx={{color:'Highlight'}}  value={2}>Agent</MenuItem>
+                                                <MenuItem sx={{color:'Highlight'}}  value={3}>Vet Doctor</MenuItem>
+                                                {//<MenuItem sx={{color:'Highlight'}}  value={4}>Farmer</MenuItem>
+                                                //<MenuItem sx={{color:'Highlight'}} value={1}>Admin</MenuItem>
+                                                }
                                             </Select>
                                             {touched.role && errors.role && (
                                                 <p style={{ color: 'red' }}>{errors.role}</p>
@@ -346,22 +402,28 @@ export default function BasicModal({ open, handleClose, userdata,setSuccess}) {
                                         </FormControl>
                                     </Grid>
 
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={4}
+                                     sx={{
+                                        visibility:'hidden'
+                                    }} >
                                         <TextField
                                             id="longitude"
                                             name="longitude"
                                             label="Longitude"
-                                            type="number"
+                                            type="numbe"
                                             variant="filled"
                                             value={values.longitude}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            sx={{ mb: 2, width: '100%', padding: '5px' }}
+                                            sx={{ mb: 2, width: '100%', padding: '5px',  }}
                                             error={touched.longitude && Boolean(errors.longitude)}
                                             helperText={touched.longitude && errors.longitude}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={4}  sx={{
+
+                                        visibility:'hidden'
+                                    }}>
                                         <TextField
                                             id="latitude"
                                             name="latitude"

@@ -28,7 +28,55 @@ export const AuthProvider = ({ children }) => {
       'x-access-token': user?.authToken,
     },
   });
- 
+  // axiosInstance.interceptors.response.use(
+  //   (response) => {
+     
+  //     if (response.status === 403) {
+  //       useLocalStorage("user", null);
+  //        window.location.href = '/login';
+  //       return Promise.reject(response);
+  //     }
+  //     return Promise.resolve(response);
+  //   },
+  //   async (error) => {
+  //     // Handle error...
+  //     const originalRequest = error.config;
+  //     if (error.response.status === 403 && originalRequest.url === 'http://localhost:6002/api/auth/refreshToken') {
+  //       useLocalStorage("user", null);
+  //       window.location.href = '/login';
+  //       return Promise.reject(error);
+  //     }
+  
+  //     if (error.response.status === 403) {
+  //       let retryCount = originalRequest.retryCount || 0;
+  //       if (retryCount < 2) {
+  //         originalRequest.retryCount = retryCount + 1;
+  //         const refreshToken = user.refreshToken;
+  //         try {
+  //           const { data } = await axiosInstance.post('/api/auth/refreshToken', {
+  //             refreshToken,
+  //           });
+  //           setUser(data);
+  //           axiosInstance.defaults.headers['x-access-token'] = data.authToken;
+  //           return axiosInstance(originalRequest);
+  //         } catch (_error) {
+            
+  //           useLocalStorage("user", null);
+  //            window.location.href = '/login';
+  //           return Promise.reject(_error);
+  //         }
+  //       } else {
+  //          window.location.href = '/login';
+  //         useLocalStorage("user", null);
+  //         return Promise.reject(error);
+  //       }
+  //     }
+  //      window.location.href = '/login';
+  //     useLocalStorage("user", null);
+  //     return Promise.reject(error);
+  //   }
+  // );
+  
   const showToastMessage = (text,type) => {
     if(type==="success"){
       toast.success(text);

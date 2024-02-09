@@ -5,10 +5,14 @@ import * as yup from "yup";
 import Header from "../../components/Header";
 import {useAuth} from "../../AUTH/AuthContext"
 import React from "react";  
+import { useTheme } from "@mui/material";
 const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
 });
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const LOGIN_URL = 'http://localhost:6002/api/user/login'
 
 const initialValues = {
@@ -21,7 +25,8 @@ function Login() {
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = () => setShowPassword(false);
-  const {login}= useAuth()
+  const {login,showToastMessage}= useAuth()
+  const theme = useTheme();
   const handleFormSubmit = async (values, { setSubmitting })  => {
     const data = {
       email: values.email,
@@ -39,9 +44,14 @@ function Login() {
           if (res.status === 200) {
             login(res.data.data)  
           }
+   
+         
+          if(res.data.data=="Invalid email or password"){
+            showToastMessage(res.data.data, "error");
+          }
       })
       .catch((err) => {
-        console.log(err);
+        showToastMessage(err.response.data.message, "error");
         
       });
 
@@ -49,6 +59,19 @@ function Login() {
   };
 
   return (
+    <>
+    <ToastContainer
+     position="top-center"
+     autoClose={5000}
+     hideProgressBar={false}
+     newestOnTop={false}
+     closeOnClick
+     rtl={false}
+     pauseOnFocusLoss
+     draggable
+     pauseOnHover
+     theme={theme.palette.mode === "dark" ? "dark" : "light"}
+    />
     <Box
       display="flex"
       flexDirection="column"
@@ -58,11 +81,13 @@ function Login() {
       mx="auto" // Center horizontally
     >
       <Header title="Login" subtitle="Enter your login details and submit" />
-
+      
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={checkoutSchema}
+        showPassword={showPassword}
+
       >
         {({
           values,
@@ -119,6 +144,8 @@ function Login() {
         )}
       </Formik>
     </Box>
+    </>
+
   );
 }
 
