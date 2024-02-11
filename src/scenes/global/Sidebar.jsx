@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "../../index.css";
@@ -16,37 +16,92 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import {useAuth} from "../../AUTH/AuthContext"
-
+import { useAuth } from "../../AUTH/AuthContext"
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-<MenuItem
-  active={selected === title}
-  style={{
-    color: colors.grey[100],
-  }}
-  onClick={() =>{ setSelected(title)}}
-  icon={icon}
->
-  <Link to={to} style={{textDecoration:'none'}} >
-    <Typography
+    <MenuItem
+      active={selected === title}
+      style={{
+        color: colors.grey[100],
+      }}
+      onClick={() => { setSelected(title) }}
+      icon={icon}
+    >
+      <Link to={to} style={{ textDecoration: 'none' }} >
+        <Typography
 
-      variant="h5"
-      color={colors.grey[100]}
-     >{title}</Typography>
-  </Link>
-</MenuItem>
+          variant="h5"
+          color={colors.grey[100]}
+        >{title}</Typography>
+      </Link>
+    </MenuItem>
   );
 };
+const AccordionItem = ({ data, subsection_title }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
+  return (<Accordion>
+    <AccordionSummary
+      expandIcon={<ArrowDropDownIcon />}
+      aria-controls="panel1a-content"
+      id="panel1a-header"
+      style={{
+        background: colors.primary[400],
+      }}
+    >
+      <Typography
+        variant="h6"
+        color={colors.grey[300]}
+        sx={{ m: "15px 0 5px 20px" }}
+      >
+        {subsection_title}
+      </Typography>
+
+    </AccordionSummary>
+    <AccordionDetails
+      style={{
+        background: colors.primary[400],
+      }}
+    >
+      {
+        data.map(item => {
+          return (
+            <MenuItem
+              active={item.selected === item.title}
+
+              onClick={() => { setSelected(item.title) }}
+              icon={item.icon}
+            >
+              <Link to={item.to} style={{ textDecoration: 'none' }} >
+                <Typography
+                  variant="h5"
+                  color={colors.grey[100]}
+                >{item.title}</Typography>
+              </Link>
+            </MenuItem>
+          )
+        })
+      }
+
+    </AccordionDetails>
+  </Accordion>
+  );
+}
 const Side_Bar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const {user} = useAuth()
+  const { user } = useAuth()
   const [open, setOpen] = useState(false);
   return (
     <Box
@@ -68,10 +123,10 @@ const Side_Bar = () => {
         },
       }}
     >
-      <Sidebar 
-       collapsed={isCollapsed}
-       backgroundColor={colors.primary[400]}
-       >
+      <Sidebar
+        collapsed={isCollapsed}
+        backgroundColor={colors.primary[400]}
+      >
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
@@ -117,26 +172,26 @@ const Side_Bar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                 {user?.user?.Agency?.name}
+                  {user?.user?.Agency?.name}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                {`${user.user.fname} ${user.user.lname}`}
+                  {`${user.user.fname} ${user.user.lname}`}
 
-           
+
                 </Typography>
               </Box>
             </Box>
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            
-            {/* <Item
+
+            <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
 
             <Typography
               variant="h6"
@@ -146,20 +201,13 @@ const Side_Bar = () => {
               Data
             </Typography>
             <Item
-              title="Manage Users"
-              to="/team"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="Manage Agents"
               to="/agents"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            {/* <Item
+            <Item
               title="Contacts Information"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
@@ -172,22 +220,41 @@ const Side_Bar = () => {
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
-       
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-            {/* <Item
-              title="Profile Form"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
+
+
+            <AccordionItem
+              subsection_title="Business"
+              data={[
+                {
+                  title: "Manage Business",
+                  to: "/agents",
+                  icon: <PersonOutlinedIcon />,
+                  selected: { selected },
+                  setSelected: { setSelected }
+                },
+                {
+                  title: "Manage Business",
+                  to: "/agents",
+                  icon: <PersonOutlinedIcon />,
+                  selected: { selected },
+                  setSelected: { setSelected }
+                }
+              ]}
+            />
+            <AccordionItem
+              subsection_title="Plans"
+              data={[
+                {
+                  title: "Kuku",
+                  to: "/kuku",
+                  icon: <BusinessOutlinedIcon />,
+                  selected: { selected },
+                  setSelected: { setSelected }
+                }
+              ]}
+            />
+            
             <Item
               title="Calendar"
               to="/calendar"
@@ -237,7 +304,7 @@ const Side_Bar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
           </Box>
         </Menu>
       </Sidebar>

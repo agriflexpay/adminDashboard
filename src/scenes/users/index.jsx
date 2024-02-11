@@ -44,9 +44,9 @@ function EditToolbar(props) {
 
   return (
     <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+      {/* <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
         Add record
-      </Button>
+      </Button> */}
       <GridToolbar />
     </GridToolbarContainer>
   );
@@ -380,9 +380,9 @@ export default function ManageTeam() {
           onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
-          // slots={{
-          //   toolbar: EditToolbar,
-          // }}
+          slots={{
+            toolbar: EditToolbar,
+          }}
           slotProps={{
             toolbar: { setRows, setRowModesModel },
           }}
