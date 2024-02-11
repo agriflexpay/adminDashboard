@@ -140,8 +140,8 @@ const Form = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Create New User
+              <Button type="submit" name="submit" color="secondary" onClick={()=>{console.log('qewqwe')}} variant="contained">
+                Create New Users
               </Button>
             </Box>
           </form>

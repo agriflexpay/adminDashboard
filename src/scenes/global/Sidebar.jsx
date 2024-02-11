@@ -207,6 +207,13 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+              <Item
+              title="Manage Users"
+              to="/team"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Item
               title="Contacts Information"
               to="/contacts"
