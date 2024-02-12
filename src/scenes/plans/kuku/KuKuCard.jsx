@@ -1,9 +1,4 @@
-import { useTheme } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { tokens } from "../../theme";
+import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -14,17 +9,17 @@ import Collapse from '@mui/material/Collapse';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-
+import { useTheme } from "@mui/material";
+import { tokens } from "../../../theme";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
-})
-(({ theme, expand }) => ({
+})(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
@@ -32,20 +27,24 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const KukuCard = () => {
+export default function KuKuCard() {
+  const [expanded, setExpanded] = React.useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [expanded, setExpanded] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{
+       maxWidth: 345 ,
+       bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[800] : colors.grey[900]
+       }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: blue[500] }} aria-label="recipe">
-            K
+          <Avatar sx={{ bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[500] : colors.grey[700] }} aria-label="recipe">
+            Rs
           </Avatar>
         }
         action={
@@ -58,9 +57,9 @@ const KukuCard = () => {
       />
       <CardMedia
         component="img"
-        height="194"
         image="/static/images/cards/paella.jpg"
         alt="Paella dish"
+
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
@@ -116,6 +115,4 @@ const KukuCard = () => {
       </Collapse>
     </Card>
   );
-};
-
-export default KukuCard;
+}

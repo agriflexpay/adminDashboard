@@ -207,7 +207,7 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-              <Item
+            <Item
               title="Manage Users"
               to="/team"
               icon={<PeopleOutlinedIcon />}
@@ -258,10 +258,18 @@ const Side_Bar = () => {
                   icon: <BusinessOutlinedIcon />,
                   selected: { selected },
                   setSelected: { setSelected }
+                },
+                {
+                  title: "View Kuku plans",
+                  to: "/kuku",
+                  icon: <BusinessOutlinedIcon />,
+                  selected: { selected },
+                  setSelected: { setSelected }
                 }
-              ]}
+              ]
+              }
             />
-            
+
             <Item
               title="Calendar"
               to="/calendar"
