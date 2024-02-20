@@ -15,7 +15,23 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
+import Popover from '@mui/material/Popover';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import UpgradeOutlinedIcon from '@mui/icons-material/UpgradeOutlined';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
+import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
+import { useAuth } from "../../../AUTH/AuthContext";
+import PlanService from '../../../API/Data/plans';
+import { useEffect, useState } from "react";
 
+
+
+const planData = async ({id, axios}) => {
+  const response = await PlanService.getOnePlan({id:id, axiosInstance:axios});
+  return response;
+} 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -27,45 +43,141 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-export default function KuKuCard() {
-  const [expanded, setExpanded] = React.useState(false);
+export default function KuKuCard({...props}) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [kukuPlan, setKukuPlan] = useState([]);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+  const data =async()=>{ const a= await planData({id:props.id, axios:props.axiosInstance}); setKukuPlan(a);}
+
+
+  useEffect(() => {
+    data()
+  }, []);
+
+
+
+  const activatePlan = async () => {
+    try {
+      const data={
+        plan_uuid:props.id,
+        vendor_uuid:props.vendor_id,
+      }
+      const response = await PlanService.createPlan({data:data, axiosInstance:props.axiosInstance});
+      console.log(response);
+      if(response.status === 200){
+        props.setMessage("Plan activated", "success");
+        props.setShowMesssage(true);
+        data()
+      }
+    } catch (error) {
+      props.setMessage(error.response.data.message, "error");
+      props.setShowMesssage(true);
+    }
+  }
+
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
+
+
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined
+
+
+  
+  const handleExpandClick = () => {
+    props.setExpanded(!props.expanded);
+  };
+
+
 
   return (
     <Card sx={{
-       maxWidth: 345 ,
-       bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[800] : colors.grey[900]
-       }}>
+      bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[800] : colors.grey[900]
+    }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[500] : colors.grey[700] }} aria-label="recipe">
-            Rs
+          <Avatar aria-label="recipe">
+            {props?.avatar || "M"}
           </Avatar>
         }
         action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
+          <IconButton aria-label="settings"  >
+            <MoreVertIcon onClick={handleClick} aria-describedby={id} variant="contained" />
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+
+              sx={{
+                mt: "10px",
+                mb: "20px",
+              }}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'center',
+                horizontal: 'left',
+              }}
+            >
+              <Box 
+                display="grid"
+                gap=".5rem"
+                gridTemplateColumns="repeat(1, minmax(0, 1fr))"
+                sx={{
+                   bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[800] : colors.grey[900],
+                   width: "fit-content",
+                   }}>
+                <Button
+                 variant="contained"
+                  sx={{background:theme.palette.mode === "dark" ? colors.greenAccent[700] : colors.greenAccent[200]}}
+                   startIcon={<UpgradeOutlinedIcon />}>
+                  Update
+                </Button>
+                <Button
+                 variant="contained"
+                  sx={{background:theme.palette.mode === "dark" ? colors.redAccent[500] :  colors.redAccent[500]}}
+                   startIcon={<DeleteForeverOutlinedIcon />}>
+                  Delete
+                </Button>
+                <Button 
+                onClick={()=>{kukuPlan?.data?.id??activatePlan()}}
+                variant="contained" 
+                sx={{background:theme.palette.mode === "dark" ? colors.blueAccent[700] : colors.blueAccent[200]}} 
+                startIcon={
+                  kukuPlan?.data?.id? <ToggleOffOutlinedIcon />:<ToggleOnOutlinedIcon /> 
+                }>
+                  {kukuPlan?.data?.id? "Disable" : "Enable"}
+                </Button>
+              </Box>
+            </Popover>
           </IconButton>
         }
-        title="Shrimps and Chorizo Paella"
-        subheader="September 14, 2016"
+        title={props?.name || "Plan Name"}
+        subheader={props?.createdAt || "Date"}
       />
       <CardMedia
         component="img"
-        image="/static/images/cards/paella.jpg"
-        alt="Paella dish"
+        image={props.image}
+        alt="Mising image please update "
 
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the mussels,
-          if you like.
+          {props?.description || "Missing description"}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
@@ -76,40 +188,138 @@ export default function KuKuCard() {
           <ShareIcon />
         </IconButton>
         <ExpandMore
-          expand={expanded}
+          expand={props?.expanded}
           onClick={handleExpandClick}
-          aria-expanded={expanded}
+          aria-expanded={props?.expanded}
           aria-label="show more"
         >
           <ExpandMoreIcon />
         </ExpandMore>
       </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={props?.expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography paragraph>Method:</Typography>
-          <Typography paragraph>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-            aside for 10 minutes.
+
+          <Typography
+            variant='h4'
+            color={theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}
+            fontWeight={theme.typography.fontWeightBold}
+            sx={{ m: "0 0 5px 0" }}
+          >
+            {props?.details || "Plan Detailed Description"}
           </Typography>
           <Typography paragraph>
-            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-            large plate and set aside, leaving chicken and chorizo in the pan. Add
-            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-            stirring often until thickened and fragrant, about 10 minutes. Add
-            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >Name: </span>  {props?.name || "Plan Name"}
           </Typography>
           <Typography paragraph>
-            Add rice and stir very gently to distribute. Top with artichokes and
-            peppers, and cook without stirring, until most of the liquid is absorbed,
-            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-            mussels, tucking them down into the rice, and cook again without
-            stirring, until mussels have opened and rice is just tender, 5 to 7
-            minutes more. (Discard any mussels that don&apos;t open.)
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >Initial Amount: </span>
+            {props?.amount || "Plan Initial Amount"}
           </Typography>
-          <Typography>
-            Set aside off of the heat to let rest for 10 minutes, and then serve.
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Duration in Months: </span>
+            {props?.duration || "Plan Duration in Months"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Interest rate pa: </span>
+            {props?.interest_rate || "Plan Interest rate pa"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Type: </span> {props?.type || "Plan Type"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Maturity in months: </span>
+            {props?.maturity || "Plan Maturity in months"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Average Egg production: </span>
+            {props?.averageEggProduction || "Plan Average Egg production"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Meat production (kg): </span>
+            {props?.meatProduction || "Plan Meat production (kg)"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Feeding: </span>
+
+            {props?.feeding || "Plan Feeding"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Settiing: </span>
+            {props?.setting || "Plan Settiing"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Decline In prodaction: </span>
+            {props?.declineinProduction || "Plan Decline In prodaction"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Disease Resistance: </span>
+            {props?.diseaseResistance || "Plan Disease Resistance"}
+          </Typography>
+          <Typography paragraph>
+            <span
+              style={{
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+              }}
+            >
+              Average Weight : </span>
+            {props?.initialAmount || "Plan Average Weight"}
           </Typography>
         </CardContent>
       </Collapse>
