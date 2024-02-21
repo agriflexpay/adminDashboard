@@ -221,13 +221,6 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Invoices Balances"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
 
 
             <AccordionItem
@@ -235,15 +228,15 @@ const Side_Bar = () => {
               data={[
                 {
                   title: "Manage Business",
-                  to: "/agents",
+                  to: "/business",
                   icon: <PersonOutlinedIcon />,
                   selected: { selected },
                   setSelected: { setSelected }
                 },
                 {
-                  title: "Manage Business",
-                  to: "/agents",
-                  icon: <PersonOutlinedIcon />,
+                  title: "Invoices Balances",
+                  to: "/invoices",
+                  icon: < ReceiptOutlinedIcon />,
                   selected: { selected },
                   setSelected: { setSelected }
                 }
@@ -254,13 +247,6 @@ const Side_Bar = () => {
               data={[
                 {
                   title: "Kuku",
-                  to: "/kuku",
-                  icon: <BusinessOutlinedIcon />,
-                  selected: { selected },
-                  setSelected: { setSelected }
-                },
-                {
-                  title: "View Kuku plans",
                   to: "/kuku",
                   icon: <BusinessOutlinedIcon />,
                   selected: { selected },
