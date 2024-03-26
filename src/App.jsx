@@ -21,6 +21,9 @@ import KukuPlan from "./scenes/plans/kuku/index";
 import { useAuth } from "./AUTH/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Plans from "./scenes/business/index";
+import  GeographyChart from "./scenes/geography/index"
+import MapView from "./scenes/geography/leafelet/index"
+import Applications from "./scenes/applications";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(false);
@@ -61,6 +64,9 @@ function App() {
                     <Route path="/agents" element={<Agents />} />
                     <Route path="/kuku" element={<KukuPlan />} />
                     <Route path="/business" element={<Plans />} />
+                    <Route path="/geography" element={<GeographyChart/>}/>
+                    <Route path="/map" element={<MapView/>}/>
+                    <Route path="/applications" element={<Applications/>}/>
                   </Routes>
                 </main>
             

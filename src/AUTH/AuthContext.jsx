@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     navigate("/login", { replace: true });
   };
   const axiosInstance = axios.create({
-    baseURL: 'http://localhost:6002', // Replace with your API's base URL
+    baseURL: 'http://localhost:6002/', // Replace with your API's base URL
     headers: {
       'Content-Type': 'application/json',
       'x-access-token': user?.authToken,

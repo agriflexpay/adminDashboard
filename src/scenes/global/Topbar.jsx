@@ -28,7 +28,7 @@ const handleLogout = () => {
   }
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}
+    <Box display="flex" justifyContent="space-between" p={0}
     sx={{ position: 'sticky', top: 0 , zIndex: 1000, backgroundColor: colors.primary[400]}}
     >
       {/* SEARCH BAR */}

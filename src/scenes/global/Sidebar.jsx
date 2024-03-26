@@ -32,14 +32,15 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       style={{
         color: colors.grey[100],
       }}
+      sx={{ ":hover": { color:theme.palette.mode === "dark" ? colors.primary[900] : colors.primary[100]} }}
       onClick={() => { setSelected(title) }}
       icon={icon}
     >
       <Link to={to} style={{ textDecoration: 'none' }} >
         <Typography
-
+            sx={{ ":hover": { color: colors.primary[900] } }}
           variant="h5"
-          color={colors.grey[100]}
+          color={colors.primary[100]}
         >{title}</Typography>
       </Link>
     </MenuItem>
@@ -145,7 +146,7 @@ const Side_Bar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  Admins
+                  Menu Bar
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -154,7 +155,7 @@ const Side_Bar = () => {
             )}
           </MenuItem>
 
-          {!isCollapsed && (
+          {/* {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
@@ -181,7 +182,7 @@ const Side_Bar = () => {
                 </Typography>
               </Box>
             </Box>
-          )}
+          )} */}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
 
@@ -236,6 +237,13 @@ const Side_Bar = () => {
                 {
                   title: "Invoices Balances",
                   to: "/invoices",
+                  icon: < ReceiptOutlinedIcon />,
+                  selected: { selected },
+                  setSelected: { setSelected }
+                },
+                {
+                  title: "Applications",
+                  to: "/applications",
                   icon: < ReceiptOutlinedIcon />,
                   selected: { selected },
                   setSelected: { setSelected }
@@ -306,6 +314,14 @@ const Side_Bar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+            title="map"
+            to="/map"
+            icon={<MapOutlinedIcon />}
+            selected={selected}
+            setSelected={setSelected}
+            />
+            
           </Box>
         </Menu>
       </Sidebar>
