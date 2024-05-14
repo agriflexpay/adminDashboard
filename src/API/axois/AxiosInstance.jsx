@@ -6,7 +6,7 @@ const apiKey = user.authToken
 
 // Create a configured Axios instance with default headers
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:6002', // Replace with your API's base URL
+  baseURL: 'https://2ee3-102-0-6-134.ngrok-free.app', // Replace with your API's base URL
   headers: {
     'Content-Type': 'application/json',
     'x-access-token': apiKey,

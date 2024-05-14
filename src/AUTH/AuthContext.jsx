@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo,useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage"
+import { useLocalStorage } from "./useLocalStorage";
 import axios from 'axios';
 const AuthContext = createContext({});
 import { ToastContainer, toast } from "react-toastify";

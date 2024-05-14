@@ -28,10 +28,17 @@ import { useEffect, useState } from "react";
 
 
 
-const planData = async ({id, axios}) => {
-  const response = await PlanService.getOnePlan({id:id, axiosInstance:axios});
+const planData = async ({ id, axios }) => {
+  const response = await PlanService.getOnePlan({ id: id, axiosInstance: axios }) || []
+
   return response;
-} 
+}
+const activePlans = async ({ id, axios }) => {
+  const response = await PlanService.fetchPlanByAgency({ agency_uuid: id, axiosInstance: axios });
+  return response;
+}
+
+
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -43,30 +50,38 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-export default function KuKuCard({...props}) {
+const planIsActive = (plans, id) => plans.includes(id);
+
+export default function KuKuCard({ ...props }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [anchorEl, setAnchorEl] = useState(null);
   const [kukuPlan, setKukuPlan] = useState([]);
+  const [activePlan, setActivePlan] = useState([]);
 
-  const data =async()=>{ const a= await planData({id:props.id, axios:props.axiosInstance}); setKukuPlan(a);}
-
+  const data = async () => { const a = await planData({ id: props.id, axios: props.axiosInstance }); setKukuPlan(a); }
+  const activeData = async () => {
+    const a = await activePlans({ id: props.vendor_id, axios: props.axiosInstance });
+    const active_uuids = (a??[]).map(item => { return item?.KukuPlan?.id })
+    setActivePlan(active_uuids)
+  }
 
   useEffect(() => {
     data()
+    activeData()
   }, []);
 
 
 
   const activatePlan = async () => {
     try {
-      const data={
-        plan_uuid:props.id,
-        vendor_uuid:props.vendor_id,
+      const data = {
+        plan_uuid: props.id,
+        vendor_uuid: props.vendor_id,
       }
-      const response = await PlanService.createPlan({data:data, axiosInstance:props.axiosInstance});
+      const response = await PlanService.createPlan({ data: data, axiosInstance: props.axiosInstance });
       console.log(response);
-      if(response.status === 200){
+      if (response.status === 200) {
         props.setMessage("Plan activated", "success");
         props.setShowMesssage(true);
         data()
@@ -94,7 +109,7 @@ export default function KuKuCard({...props}) {
   const id = open ? 'simple-popover' : undefined
 
 
-  
+
   const handleExpandClick = () => {
     props.setExpanded(!props.expanded);
   };
@@ -133,34 +148,36 @@ export default function KuKuCard({...props}) {
                 horizontal: 'left',
               }}
             >
-              <Box 
+              <Box
                 display="grid"
                 gap=".5rem"
                 gridTemplateColumns="repeat(1, minmax(0, 1fr))"
                 sx={{
-                   bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[800] : colors.grey[900],
-                   width: "fit-content",
-                   }}>
+                  bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[900] : colors.grey[900],
+                  width: "fit-content",
+                }}>
                 <Button
-                 variant="contained"
-                  sx={{background:theme.palette.mode === "dark" ? colors.greenAccent[700] : colors.greenAccent[200]}}
-                   startIcon={<UpgradeOutlinedIcon />}>
+                  variant="contained"
+                  sx={{ background: theme.palette.mode === "dark" ? colors.greenAccent[800] : colors.greenAccent[200] }}
+                  startIcon={<UpgradeOutlinedIcon />}>
                   Update
                 </Button>
                 <Button
-                 variant="contained"
-                  sx={{background:theme.palette.mode === "dark" ? colors.redAccent[500] :  colors.redAccent[500]}}
-                   startIcon={<DeleteForeverOutlinedIcon />}>
+                  variant="contained"
+                  sx={{ background: theme.palette.mode === "dark" ? colors.redAccent[600] : colors.redAccent[500] }}
+                  startIcon={<DeleteForeverOutlinedIcon />}
+                  onClick={() => { console.log(activePlan) }}
+                >
                   Delete
                 </Button>
-                <Button 
-                onClick={()=>{kukuPlan?.data?.id??activatePlan()}}
-                variant="contained" 
-                sx={{background:theme.palette.mode === "dark" ? colors.blueAccent[700] : colors.blueAccent[200]}} 
-                startIcon={
-                  kukuPlan?.data?.id? <ToggleOffOutlinedIcon />:<ToggleOnOutlinedIcon /> 
-                }>
-                  {kukuPlan?.data?.id? "Disable" : "Enable"}
+                <Button
+                  onClick={() => { kukuPlan?.data?.id ?? activatePlan() }}
+                  variant="contained"
+                  sx={{ background: theme.palette.mode === "dark" ? colors.blueAccent[700] : colors.blueAccent[200] }}
+                  startIcon={
+                    planIsActive(activePlan,kukuPlan?.data?.id) ? <ToggleOffOutlinedIcon /> : <ToggleOnOutlinedIcon />
+                  }>
+                  {planIsActive(activePlan,kukuPlan?.data?.id) ? "Disable" : "Enable"}
                 </Button>
               </Box>
             </Popover>
@@ -210,14 +227,14 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >Name: </span>  {props?.name || "Plan Name"}
           </Typography>
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >Initial Amount: </span>
             {props?.amount || "Plan Initial Amount"}
@@ -225,7 +242,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Duration in Months: </span>
@@ -234,7 +251,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Interest rate pa: </span>
@@ -243,7 +260,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Type: </span> {props?.type || "Plan Type"}
@@ -251,7 +268,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Maturity in months: </span>
@@ -260,7 +277,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Average Egg production: </span>
@@ -269,7 +286,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Meat production (kg): </span>
@@ -278,7 +295,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Feeding: </span>
@@ -288,7 +305,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Settiing: </span>
@@ -297,7 +314,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Decline In prodaction: </span>
@@ -306,7 +323,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Disease Resistance: </span>
@@ -315,7 +332,7 @@ export default function KuKuCard({...props}) {
           <Typography paragraph>
             <span
               style={{
-                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] :  colors.blueAccent[300]}`,
+                color: `${theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.blueAccent[300]}`,
               }}
             >
               Average Weight : </span>

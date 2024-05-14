@@ -21,27 +21,26 @@ import { useAuth } from "../../AUTH/AuthContext";
 import  PlanService  from "../../API/Data/plans/index"
 import { useEffect, useState } from "react";
 import PreviewOutlinedIcon from '@mui/icons-material/PreviewOutlined';
+import bookingsService from "../../API/Data/bookings/index";
 const Applications = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { axiosInstance, logout, showToastMessage } = useAuth();
   const { user } = useAuth();
-  const [Plandata, setPlanData] = useState([]);
-
+  const [ApplicationData, setApplicationData] = useState([]);
 
   const { refetch: data } = useQuery(
-    "plans",
+    "bookings",
     async () => {
-      const response = await PlanService.fetchPlanByAgency({
-        axiosInstance: axiosInstance,
-        agency_uuid: user?.user?.Agency?.id
-      });
+      const response = await bookingsService.getBookingsByAgeny(  axiosInstance,
+        user?.user?.Agency?.id);
       return response;
     },
     {
       onSuccess: (data) => {
-        setPlanData(()=>{
-          return [...data]
+        setApplicationData(()=>{
+          console.log(data)
+          return [...data.data.data]
         });
       },
       onError: (error) => {
@@ -50,32 +49,27 @@ const Applications = () => {
     }
   )
 
+
   useEffect(() => {
     data()
   }, []);
   
-  const handleDelete = async (id) => {
-    const response = await PlanService.deletePlan({
-      axiosInstance:axiosInstance,
-      id:id})
-    if (response===1) {
-      showToastMessage("Plan Deleted Successfully", "success");
-      data()
-    } else {
-      showToastMessage("Plan Deletion Failed", "error");
-    }
-  }
 
-  const rows = (Plandata && Plandata.map((plan) => {
+  console.log(ApplicationData)
+  const rows = (ApplicationData && ApplicationData.map((data) => {
     return {
-      id: plan.id,
-      name: plan?.KukuPlan?.name,
-      lname: plan.sales,
-      initial_amount: plan?.KukuPlan?.amount,
-      time: plan?.KukuPlan?.duration,
-      phaone: plan.projected_profit,
-      createdAt: plan.createdAt,
-      Interest_rate: plan?.KukuPlan?.interest_rate
+      id: data.id,
+      plan_uuid: data.Plan.id,
+      famer:`${data.User.first_name} ${data.User.last_name}`,
+      phone: data.User.phone,
+      email: data.User.email,
+      avatar: data.User.avatar,
+      createdAt: data.createdAt,
+      national_id: data.User.national_id,
+      krapin: data.User.krapin,
+      plan_name: data.Plan.KukuPlan.name,
+      amount: data.Plan.KukuPlan.amount,
+
 
     }
   }
@@ -83,13 +77,22 @@ const Applications = () => {
   ) || []
 
   const columns = [
-    { field: "name", headerName: "Plan Name", flex: .5 },
-    { field: "sales", headerName: "Sales", flex: .5 },
-    { field: "initial_amount", headerName: "Initial Amount", flex: .5 },
-    { field: "phaone", headerName: "Projected Profit", flex: .5 },
-    { field: "time", headerName: "Duration (months)", flex: .5 },
-    { field: "createdAt", headerName: "CreatedAt", flex: 1 },
-    { field: "Interest_rate", headerName: "% Interest Rate(pa)", flex: .5 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "plan_uuid", headerName: "Plan ID", flex: 1 },
+    { field: "famer", headerName: "Farmer", flex: 1 },
+    { field: "phone", headerName: "Phone", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "avatar", headerName: "Avatar", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    { field: "national_id", headerName: "National ID", flex: 1 },
+    { field: "krapin", headerName: "KRA PIN", flex: 1 },
+    { field: "plan_name", headerName: "Plan Name", flex: 1 },
+    { field: "amount", headerName: "Amount", flex: 1 },
+   
+   
+   
+   
+   
     {
       field: "actions",
       headerName: "Actions",
